@@ -82,6 +82,7 @@ int main()
 			pf.prediction(delta_t, sigma_pos, previous_velocity, previous_yawrate);
 		  }
 
+      // cout << "Here -1." << endl;
 		  // receive noisy observation data from the simulator
 		  // sense_observations in JSON format [{obs_x,obs_y},{obs_x,obs_y},...{obs_x,obs_y}]
 		  	vector<LandmarkObs> noisy_observations;
