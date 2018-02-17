@@ -18,7 +18,7 @@
 #include "particle_filter.h"
 
 // Number of Particles
-#define NUM_PARTICLES 10
+#define NUM_PARTICLES 100
 // For well formed input
 #define SMALL_NUMBER 0.00001
 
@@ -160,14 +160,15 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 
 	// cout << "Debug: updateWeights Start" << endl;
 
+	// to be used later for normalization
 	double total_weight = 0.0;
 
 	for (auto& particle: particles)
 	{
+		// reset weight, as it will be recalculated on each update
 		particle.weight = 1.0;
 		
 		std::vector<LandmarkObs> predicted;
-
 		for (auto& landmark: map_landmarks.landmark_list)
 		{
 			double d = dist(particle.x, particle.y, landmark.x_f, landmark.y_f);
@@ -186,8 +187,9 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			}
 		}
 
+		// in order to calculate weight, we first need to transform the measurements from
+		// car's local co-ordinate system to map's co-ordinate system:
 		std::vector<LandmarkObs> transformed_observations;
-
 		for (auto& obs: observations)
 		{
 			LandmarkObs new_obs;
@@ -198,6 +200,7 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 			transformed_observations.push_back(new_obs);
 		}
 
+		// now look for predictions that are nearest to landmark observations:
 		for (auto& obs: transformed_observations)
 		{
 			LandmarkObs nearest_obs;
@@ -218,6 +221,8 @@ void ParticleFilter::updateWeights(double sensor_range, double std_landmark[],
 				}
 			}
 
+			// compute weight of the particle:
+			
 			double std_x = std_landmark[0];
 			double std_y = std_landmark[1];
 
